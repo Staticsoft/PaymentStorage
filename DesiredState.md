@@ -5,12 +5,12 @@ A library that orchestrates payment subscription management by coordinating betw
 
 ## Core Class
 
-### PaymentStorage
+### Users
 Concrete class that manages user subscription status by coordinating between Billing and Partitions.
 
 **Constructor**:
 ```csharp
-public class PaymentStorage(
+public class Users(
     Billing billing,
     Partitions partitions,
     PaymentStorageOptions options
@@ -19,7 +19,7 @@ public class PaymentStorage(
 
 **Methods**:
 ```csharp
-public class PaymentStorage
+public class Users
 {
     /// <summary>
     /// Retrieves subscription information for a user.
@@ -91,7 +91,7 @@ Configuration options for PaymentStorage.
 ```csharp
 public class PaymentStorageOptions
 {
-    public string PartitionName { get; init; } = "Users";
+    public string UsersPartitionName { get; init; } = "Users";
 }
 ```
 
