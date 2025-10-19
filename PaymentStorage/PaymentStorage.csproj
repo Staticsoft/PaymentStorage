@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>Staticsoft.$(MSBuildProjectName)</RootNamespace>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <PackageId>Staticsoft.$(MSBuildProjectName)</PackageId>
+        <VersionPrefix>1.0.0</VersionPrefix>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/Staticsoft/PaymentStorage</RepositoryUrl>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Staticsoft.Payments.Abstractions" Version="1.0.0-5" />
+        <PackageReference Include="Staticsoft.PartitionedStorage.Abstractions" Version="1.0.0-12" />
+    </ItemGroup>
+
+</Project>
