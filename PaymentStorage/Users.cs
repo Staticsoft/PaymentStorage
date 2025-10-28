@@ -10,13 +10,14 @@ public class Users(
 )
 {
     readonly Billing Billing = billing;
-    readonly Partition<UserData> Partition = partitions.Get<UserData>(options.UsersPartitionName);
+    readonly Partition<UserData> UsersPartition = partitions.Get<UserData>(options.UsersPartitionName);
+    readonly Partition<CustomerData> CustomersPartition = partitions.Get<CustomerData>(options.CustomersPartitionName);
 
     public async Task<UserSubscription> Get(string userId)
     {
         try
         {
-            var item = await Partition.Get(userId);
+            var item = await UsersPartition.Get(userId);
             return new UserSubscription
             {
                 UserId = userId,
@@ -30,26 +31,31 @@ public class Users(
         }
     }
 
-    public async Task Update(string userId, SubscriptionStatus status)
+    public async Task Update(string customerId, SubscriptionStatus status)
     {
         try
         {
-            var item = await Partition.Get(userId);
+            var customerItem = await CustomersPartition.Get(customerId);
+            var userId = customerItem.Data.UserId;
+            
+            var userItem = await UsersPartition.Get(userId);
+            
             var updatedData = new UserData
             {
-                CustomerId = item.Data.CustomerId,
+                CustomerId = customerId,
                 Status = status
             };
-            await Partition.Save(new Item<UserData>
+            
+            await UsersPartition.Save(new Item<UserData>
             {
                 Id = userId,
-                Version = item.Version,
+                Version = userItem.Version,
                 Data = updatedData
             });
         }
         catch (PartitionedStorageItemNotFoundException)
         {
-            throw new UserNotFoundException(userId);
+            throw new UserNotFoundException(customerId);
         }
     }
 
@@ -57,16 +63,23 @@ public class Users(
     {
         try
         {
-            var userData = new UserData
-            {
-                CustomerId = customerId,
-                Status = SubscriptionStatus.New
-            };
-            
-            await Partition.Save(new Item<UserData>
+            await UsersPartition.Save(new Item<UserData>
             {
                 Id = userId,
-                Data = userData
+                Data = new UserData
+                {
+                    CustomerId = customerId,
+                    Status = SubscriptionStatus.New
+                }
+            });
+            
+            await CustomersPartition.Save(new Item<CustomerData>
+            {
+                Id = customerId,
+                Data = new CustomerData
+                {
+                    UserId = userId
+                }
             });
         }
         catch (PartitionedStorageItemAlreadyExistsException)
@@ -77,7 +90,7 @@ public class Users(
 
     public async Task Synchronize()
     {
-        var allUsers = await Partition.Scan(new ScanOptions());
+        var allUsers = await UsersPartition.Scan(new ScanOptions());
         
         foreach (var userItem in allUsers)
         {
@@ -86,7 +99,7 @@ public class Users(
             
             if (userItem.Data.Status != newStatus)
             {
-                await Update(userItem.Id, newStatus);
+                await Update(userItem.Data.CustomerId, newStatus);
             }
         }
     }
@@ -120,5 +133,10 @@ public class Users(
     {
         public string CustomerId { get; init; } = string.Empty;
         public SubscriptionStatus Status { get; init; }
+    }
+    
+    class CustomerData
+    {
+        public string UserId { get; init; } = string.Empty;
     }
 }

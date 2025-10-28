@@ -118,11 +118,11 @@ public class UsersTests : TestBase<Users>
     // Level 6: Update Operations
 
     [Fact]
-    public async Task UpdatesUserStatusToTrial()
+    public async Task UpdatesUserStatusToTrialUsingCustomerId()
     {
         await SUT.Create("user-1", "cus-1");
 
-        await SUT.Update("user-1", SubscriptionStatus.Trial);
+        await SUT.Update("cus-1", SubscriptionStatus.Trial);
 
         var user = await SUT.Get("user-1");
         Assert.Equal(SubscriptionStatus.Trial, user.Status);
@@ -131,23 +131,23 @@ public class UsersTests : TestBase<Users>
     }
 
     [Fact]
-    public async Task UpdatesUserStatusToActive()
+    public async Task UpdatesUserStatusToActiveUsingCustomerId()
     {
         await SUT.Create("user-1", "cus-1");
 
-        await SUT.Update("user-1", SubscriptionStatus.Active);
+        await SUT.Update("cus-1", SubscriptionStatus.Active);
 
         var user = await SUT.Get("user-1");
         Assert.Equal(SubscriptionStatus.Active, user.Status);
     }
 
     [Fact]
-    public async Task UpdatesUserStatusToExpired()
+    public async Task UpdatesUserStatusToExpiredUsingCustomerId()
     {
         await SUT.Create("user-1", "cus-1");
-        await SUT.Update("user-1", SubscriptionStatus.Trial);
+        await SUT.Update("cus-1", SubscriptionStatus.Trial);
 
-        await SUT.Update("user-1", SubscriptionStatus.Expired);
+        await SUT.Update("cus-1", SubscriptionStatus.Expired);
 
         var user = await SUT.Get("user-1");
         Assert.Equal(SubscriptionStatus.Expired, user.Status);
