@@ -38,12 +38,12 @@ public class Users
     Task Create(string userId, string customerId);
     
     /// <summary>
-    /// Updates subscription status for a specific user.
+    /// Updates subscription status for a specific user identified by their customer ID.
     /// </summary>
-    /// <param name="userId">The unique identifier of the user.</param>
+    /// <param name="customerId">The payment provider customer identifier.</param>
     /// <param name="status">The new subscription status.</param>
-    /// <exception cref="UserNotFoundException">Thrown when the user does not exist.</exception>
-    Task Update(string userId, SubscriptionStatus status);
+    /// <exception cref="UserNotFoundException">Thrown when a user with the specified customer ID does not exist.</exception>
+    Task Update(string customerId, SubscriptionStatus status);
     
     /// <summary>
     /// Synchronizes subscription status for all users by fetching current state from the payment provider.
@@ -55,7 +55,7 @@ public class Users
 ```
 
 **Exceptions**:
-- `UserNotFoundException` - Thrown when a user with the specified ID does not exist
+- `UserNotFoundException` - Thrown when a user with the specified ID or customer ID does not exist
 - `UserAlreadyExistsException` - Thrown when attempting to create a user that already exists
 
 ## Data Types
@@ -147,7 +147,7 @@ Test scenarios are ordered by increasing complexity, following the test ordering
 
 #### Scenario: Update non-existing user throws UserNotFoundException
 **Given** the system is empty  
-**When** I try to update a user with ID "non-existing-id"  
+**When** I try to update a user with customer ID "non-existing-customer-id"  
 **Then** a `UserNotFoundException` is thrown
 
 ### Level 2: Read-Only Operations on Empty System
@@ -194,18 +194,18 @@ Test scenarios are ordered by increasing complexity, following the test ordering
 
 #### Scenario: Update user status to Trial
 **Given** I have created a user with status `New`  
-**When** I update the user's status to `Trial`  
+**When** I update the user's status to `Trial` using their customer ID  
 **Then** retrieving the user shows status `Trial`  
 **And** the user ID and customer ID remain unchanged
 
 #### Scenario: Update user status to Active
 **Given** I have created a user with status `New`  
-**When** I update the user's status to `Active`  
+**When** I update the user's status to `Active` using their customer ID  
 **Then** retrieving the user shows status `Active`
 
 #### Scenario: Update user status to Expired
 **Given** I have created a user with status `Trial`  
-**When** I update the user's status to `Expired`  
+**When** I update the user's status to `Expired` using their customer ID  
 **Then** retrieving the user shows status `Expired`
 
 #### Scenario: Synchronize updates user with active subscription
